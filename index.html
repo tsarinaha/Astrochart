@@ -1,69 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Natal Chart App</title>
-    <!-- Use the absolute path to the AstroChart file -->
-<script src="https://tsarinaha.github.io/Astrochart/project/build/astrochart.min.js"></script>
+  <meta charset="UTF-8">
+  <title>Natal Chart App</title>
+
+  <!-- Load the forked AstroChart script -->
+  <script src="https://tsarinaha.github.io/Astrochart/project/build/astrochart.min.js"></script>
+  <script>
+    // Alias the forked library to "AstroChart"
+    // Because the code actually attaches itself to window.astrology
+    window.AstroChart = window.astrology;
+  </script>
 </head>
+
 <body>
-    <h1>Your Natal Chart</h1>
-    <form id="natal-chart-form">
-        <input type="text" id="name" placeholder="Enter your name" required>
-        <input type="date" id="birth_date" required>
-        <input type="time" id="birth_time" required>
-        <input type="text" id="location" placeholder="Enter your birth location" required>
-        <button type="submit">Generate Chart</button>
-    </form>
+  <h1>Your Natal Chart</h1>
+  <form id="natal-chart-form">
+    <input type="text" id="name" placeholder="Enter your name" required>
+    <input type="date" id="birth_date" required>
+    <input type="time" id="birth_time" required>
+    <input type="text" id="location" placeholder="Enter your birth location" required>
+    <button type="submit">Generate Chart</button>
+  </form>
 
-    <div id="chart-container"></div>
+  <!-- The chart will be drawn inside this div -->
+  <div id="chart-container"></div>
 
-    <script>
-        document.getElementById('natal-chart-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
+  <script>
+    // Listen for form submission
+    document.getElementById('natal-chart-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
 
-            const requestData = {
-                name: document.getElementById('name').value,
-                birth_date: document.getElementById('birth_date').value,
-                birth_time: document.getElementById('birth_time').value,
-                location: document.getElementById('location').value
-            };
+      // Collect the user input
+      const requestData = {
+        name: document.getElementById('name').value,
+        birth_date: document.getElementById('birth_date').value,
+        birth_time: document.getElementById('birth_time').value,
+        location: document.getElementById('location').value
+      };
 
-            try {
-                const response = await fetch('https://astrologychartapi.onrender.com/calculate_chart', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(requestData)
-                });
-
-                const data = await response.json();
-
-                if (data.error) {
-                    alert(`Error: ${data.error}`);
-                } else {
-                    renderChart(data);
-                }
-            } catch (error) {
-                console.error('Error fetching chart data:', error);
-                alert('Failed to fetch chart data. Please try again later.');
-            }
+      try {
+        // POST the data to your API endpoint
+        const response = await fetch('https://astrologychartapi.onrender.com/calculate_chart', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestData)
         });
+        const data = await response.json();
 
-        function renderChart(data) {
-            new AstroChart.Chart(document.getElementById('chart-container'), {
-                planets: data.chart_in_arabic,
-                houses: data.houses,
-                aspects: data.aspects,
-                theme: {
-                    planet: { color: 'blue' },
-                    house: { borderColor: 'gray' },
-                    aspect: { lineColor: 'red' }
-                }
-            });
+        if (data.error) {
+          alert(`Error: ${data.error}`);
+        } else {
+          // If the API returns a valid chart object, render it
+          renderChart(data);
         }
-    </script>
+      } catch (error) {
+        console.error('Error fetching chart data:', error);
+        alert('Failed to fetch chart data. Please try again later.');
+      }
+    });
+
+    function renderChart(data) {
+      // Create a new chart using the forked AstroChart constructor
+      // which expects: (containerId, width, height, chartData)
+      const chart = new AstroChart.Chart(
+        'chart-container',  // The ID of the container as a string
+        600,                // Desired width
+        600,                // Desired height
+        {
+          // The data returned by your API
+          planets: data.chart_in_arabic,
+          houses: data.houses,
+          aspects: data.aspects,
+
+          // Customize the theme colors
+          theme: {
+            planet: { color: 'blue' },
+            house: { borderColor: 'gray' },
+            aspect: { lineColor: 'red' }
+          }
+        }
+      );
+
+      // Draw the radix (base) chart
+      chart.radix();
+
+      // Draw the aspects
+      chart.aspects();
+    }
+  </script>
 </body>
 </html>
