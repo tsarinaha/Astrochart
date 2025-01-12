@@ -5,12 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Natal Chart App</title>
 
-  <!-- Load the forked AstroChart script -->
-  <script src="https://tsarinaha.github.io/Astrochart/project/build/astrochart.min.js"></script>
-  <script>
-    // Alias the forked library to "AstroChart"
-    window.AstroChart = window.astrology;
-  </script>
+  <!-- Load the updated AstroChart script -->
+  <script src="https://cdn.jsdelivr.net/npm/@astrodraw/astrochart@latest/dist/astrochart.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -115,19 +111,10 @@
         }
 
         // Prepare planets data for AstroChart
-        const planetsData = data.planets.map((planet) => ({
-          name: planet.name,
-          longitude: planet.longitude,
-          retrograde: false,
-          type: "planet",
-          symbol: "•" // Dummy symbol
-        }));
-
-        // Prepare houses data for AstroChart
-        const housesData = data.cusps.map((cusp, index) => ({
-          house: index + 1,
-          longitude: cusp
-        }));
+        const planetsData = {};
+        data.planets.forEach(planet => {
+          planetsData[planet.name] = [planet.longitude];
+        });
 
         // Create a new chart using AstroChart
         const chart = new AstroChart.Chart(
@@ -136,7 +123,7 @@
           600,
           {
             planets: planetsData,
-            houses: housesData,
+            cusps: data.cusps,
             theme: {
               planet: { color: 'blue' },
               house: { borderColor: 'gray' },
