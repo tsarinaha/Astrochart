@@ -61,6 +61,8 @@
     });
 
     function renderChart(data) {
+        // Log the API response to the console for debugging
+  console.log("API Response:", data);
       // Create a new chart using the forked AstroChart constructor
       // which expects: (containerId, width, height, chartData)
       const chart = new AstroChart.Chart(
