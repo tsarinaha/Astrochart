@@ -107,9 +107,11 @@
 
     // Function to render the natal chart using AstroChart
    function renderChart(data) {
+ function renderChart(data) {
   try {
     console.log("API Response:", data);
 
+    // Validate data format
     if (!data.planets || !data.cusps) {
       throw new Error("Missing planets or cusps data in the API response.");
     }
@@ -118,8 +120,11 @@
     const planetsData = data.planets.map((planet) => ({
       name: planet.name,
       longitude: planet.longitude,
-      retrograde: planet.retrograde || false,
+      retrograde: planet.retrograde || false
     }));
+
+    // Prepare houses data
+    const housesData = data.cusps;
 
     // Create a new chart using AstroChart
     const chart = new AstroChart.Chart(
@@ -128,17 +133,22 @@
       600,
       {
         planets: planetsData,
-        houses: data.cusps,
+        houses: housesData,
         theme: {
           planet: { color: 'blue' },
           house: { borderColor: 'gray' },
-          aspect: { lineColor: 'red' },
-        },
+          aspect: { lineColor: 'red' }
+        }
       }
     );
 
     // Draw the radix (base) chart
     chart.radix();
+
+    // Optionally draw aspects
+    if (chart.aspects) {
+      chart.aspects();
+    }
   } catch (error) {
     console.error("Error rendering chart:", error);
     alert(`Error rendering chart: ${error.message}`);
