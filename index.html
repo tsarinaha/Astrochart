@@ -119,7 +119,14 @@
           name: planet.name,
           longitude: planet.longitude,
           retrograde: false,
-          type: "planet"  // Required by AstroChart
+          type: "planet",
+          symbol: "•" // Dummy symbol
+        }));
+
+        // Prepare houses data for AstroChart
+        const housesData = data.cusps.map((cusp, index) => ({
+          house: index + 1,
+          longitude: cusp
         }));
 
         // Create a new chart using AstroChart
@@ -129,7 +136,7 @@
           600,
           {
             planets: planetsData,
-            houses: data.cusps,
+            houses: housesData,
             theme: {
               planet: { color: 'blue' },
               house: { borderColor: 'gray' },
